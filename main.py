@@ -1,6 +1,7 @@
 import body
 import matplotlib.pyplot as plt 
-import numpy as np 
+import numpy as np
+import os
 import sympy as sp
 
 from scipy.integrate import solve_ivp
@@ -10,10 +11,22 @@ from time import localtime
 #planet_initial_conditions = [[.01, 2, 2, .015, 0], [.01, 3, 3, -.02, 0]]
 planet_initial_conditions = [[.1, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .01]]
 
-max_time = 100
+max_time = 10
 adaptive_step_size = 0
 step_size = 1.e-3
-figure_name = "plots/three_masses.png"
+figure_folder = "plots/"
+figure_name = "three_masses.png"
+position_files_folder = "output_files/"
+position_files_prefix = "positions_planet_"
+
+#######################################################
+
+for dirName in [figure_folder, position_files_folder]:
+    if not os.path.exists(dirName):
+        os.mkdir(dirName)
+        print("Directory ", dirName,  " Created ")
+    else:    
+        print("Directory ", dirName,  " already exists")
 
 def distance_function(x1, y1, x2, y2):
     return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
@@ -84,5 +97,10 @@ for planet in planets:
     else:
         ax2.scatter(sol.y[2 * planet_index, :] - sol.y[0, :], sol.y[2 * planet_index + 1, :] - sol.y[1, :], marker = '.', linewidths = .05, color = '.6')
 ax2.plot(0, 0, marker = '.', markersize = 20, color = 'k')
-fig.savefig(figure_name)
+fig.savefig(figure_folder + figure_name)
+
+for planet in planets:
+    planet_index = planets.index(planet)
+    np.savetxt(position_files_folder + position_files_prefix + '{}.txt'.format(planet_index), np.c_[sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :]])
+np.savetxt(position_files_folder + "time.txt", sol.t)
 print("Done!")
