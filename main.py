@@ -8,16 +8,20 @@ from scipy.integrate import solve_ivp
 from time import localtime
 
 # Planets' masses, positions, velocities
+
+# For two planets you could use these:
 #planet_initial_conditions = [[.01, 2, 2, .015, 0], [.01, 3, 3, -.02, 0]]
+
+# For three planets you could use these:
 planet_initial_conditions = [[.035, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .02]]
 
-max_time = 600
-adaptive_step_size = 1 # 1 to let the scipy solver adapt the time step size
+max_time = 1200
+adaptive_step_size = 0 # 1 to let the scipy solver adapt the time step size
 step_size = 1.e-3
 figure_folder = "plots/"
-figure_name = "three_masses_600.png"
 position_files_folder = "output_files/"
-position_files_prefix = "positions_planet_"
+figure_name = "three_masses_long.png"
+position_files_prefix = "positions_planet_long_"
 
 #######################################################
 
@@ -31,8 +35,10 @@ for dirName in [figure_folder, position_files_folder]:
 def distance_function(x1, y1, x2, y2):
     return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
+# Initialize planets of type body
 planets = [body.Body(planet_initial_conditions[i]) for i in range(len(planet_initial_conditions))]
 
+# Format list with initial positions and velocities
 U0 = []
 for i in planets:
     U0.append(i.positions)
@@ -56,8 +62,8 @@ def timestep(t, U):
             else:
                 other_planet_index = planets.index(other_planet)
                 distance = distance_function(U[2 * planet_index], U[2 * planet_index + 1], U[2 * other_planet_index], U[2 * other_planet_index + 1])
-                acc_x += planet.mass * other_planet.mass *(U[2 * other_planet_index] - U[2 * planet_index])/ distance ** (3/2.)
-                acc_y += planet.mass * other_planet.mass *(U[2 * other_planet_index + 1] - U[2 * planet_index + 1])/ distance ** (3/2.)
+                acc_x += planet.mass * other_planet.mass *(U[2 * other_planet_index] - U[2 * planet_index]) / distance ** (3/2.)
+                acc_y += planet.mass * other_planet.mass *(U[2 * other_planet_index + 1] - U[2 * planet_index + 1]) / distance ** (3/2.)
         return_array.append(acc_x)
         return_array.append(acc_y)
     
@@ -104,8 +110,10 @@ ax2.plot(0, 0, marker = '.', markersize = 20, color = 'k')
 
 # Save the file to png, and position and time data to txt
 fig.savefig(figure_folder + figure_name)
+plt.close(fig)
+
 for planet in planets:
     planet_index = planets.index(planet)
     np.savetxt(position_files_folder + position_files_prefix + '{}.txt'.format(planet_index), np.c_[sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :]])
-np.savetxt(position_files_folder + "time.txt", sol.t)
+np.savetxt(position_files_folder + position_files_prefix + "time.txt", sol.t)
 print("Done!")
