@@ -1,4 +1,4 @@
-import body
+import body as bod
 import matplotlib.pyplot as plt 
 import numpy as np
 import os
@@ -7,21 +7,21 @@ import sympy as sp
 from scipy.integrate import solve_ivp
 from time import localtime
 
-# Planets' masses, positions, velocities
-
+# Planets' masses, positions, velocities. The array is [mass, initial x position, initial y position, initial x velocity, initial y velocity].
+# If you want to add a planet, simply add an element to the array below. The script will understand.
 # For two planets you could use these:
-#planet_initial_conditions = [[.01, 2, 2, .015, 0], [.01, 3, 3, -.02, 0]]
+planet_initial_conditions = [[.02, -2, 0, .001, -.005], [.01, 3, 0, 0, 0.01]]
 
 # For three planets you could use these:
-planet_initial_conditions = [[.035, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .02]]
+#planet_initial_conditions = [[.035, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .02]]
 
-max_time = 1200
+max_time = 2000
 adaptive_step_size = 0 # 1 to let the scipy solver adapt the time step size
 step_size = 1.e-3
 figure_folder = "plots/"
 position_files_folder = "output_files/"
-figure_name = "three_masses_long.png"
-position_files_prefix = "positions_planet_long_"
+figure_name = "two_masses.png"
+position_files_prefix = "positions_planet_"
 
 #######################################################
 
@@ -36,7 +36,7 @@ def distance_function(x1, y1, x2, y2):
     return np.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
 
 # Initialize planets of type body
-planets = [body.Body(planet_initial_conditions[i]) for i in range(len(planet_initial_conditions))]
+planets = [bod.Body(planet_initial_conditions[i]) for i in range(len(planet_initial_conditions))]
 
 # Format list with initial positions and velocities
 U0 = []
@@ -100,11 +100,11 @@ ax2.set_title('Reference frame of one of the masses.')
 for planet in planets:
     planet_index = planets.index(planet)
     ax.scatter(sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :], marker = '.', s = .5, color = '.3')
-    ax.plot(sol.y[2 * planet_index, 0], sol.y[2 * planet_index + 1, 0], marker = '.', markersize = 10, color = 'k')
+    ax.plot(sol.y[2 * planet_index, -1], sol.y[2 * planet_index + 1, -1], marker = '.', markersize = 10, color = 'k')
     if planet_index == 0:
         continue
     else:
-        ax2.plot(sol.y[2 * planet_index, 0] - sol.y[0, 0], sol.y[2 * planet_index + 1, 0] - sol.y[1, 0], marker = '.', markersize = 10, color = 'k')
+        ax2.plot(sol.y[2 * planet_index, -1] - sol.y[0, -1], sol.y[2 * planet_index + 1, -1] - sol.y[1, -1], marker = '.', markersize = 10, color = 'k')
         ax2.scatter(sol.y[2 * planet_index, :] - sol.y[0, :], sol.y[2 * planet_index + 1, :] - sol.y[1, :], marker = '.', s = .5, color = '.6')
 ax2.plot(0, 0, marker = '.', markersize = 20, color = 'k')
 

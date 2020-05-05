@@ -5,29 +5,33 @@ import os
 
 from PIL import Image
 
-number_of_planets = 3
+number_of_planets = 2
 # This is where and how your PNG's will be saved
 tmp_figure_folder = "gif_figures/"
-tmp_figure_name_prefix = "tmp_"
+tmp_figure_name_prefix = "tmp_two_masses_"
 # Where your output files are and what they are called
 position_files_folder = "output_files/"
-position_files_prefix = "positions_planet_long_"
+position_files_prefix = "positions_planet_"
 time_file_name = position_files_prefix + "time.txt"
 # Controls the timestep between two plots, and total time plotted
-plot_interval = 2000
+plot_interval = 6000
 portion_of_data_used = 1
 # What do you call your GIF
-gif_name = "three_masses_longest.gif"
+gif_folder = "gifs/"
+gif_name = "two_masses.gif"
+frames_per_second = 20
+
+#######################################################
 
 times = np.loadtxt(position_files_folder + time_file_name)
 data = np.zeros((number_of_planets, 2, len(times))) # Dimensions number of planets, x or y, time
 
-dirName = tmp_figure_folder
-if not os.path.exists(dirName):
-    os.mkdir(dirName)
-    print("Directory ", dirName,  " Created ")
-else:    
-    print("Directory ", dirName,  " already exists")
+for dirName in [tmp_figure_folder, gif_folder]:
+    if not os.path.exists(dirName):
+        os.mkdir(dirName)
+        print("Directory ", dirName,  " Created ")
+    else:    
+        print("Directory ", dirName,  " already exists")
 
 for i in range(number_of_planets):
     data[i, 0, :] = np.loadtxt(position_files_folder + position_files_prefix + "{}.txt".format(i), usecols=0)
@@ -57,4 +61,4 @@ images = []
 for t in range(0, int(portion_of_data_used * len(times)), plot_interval):
     frame = Image.open(tmp_figure_folder + tmp_figure_name_prefix + "{}.png".format(t))
     images.append(frame)
-images[0].save(gif_name, save_all=True, append_images=images[1:], duration=50, loop=0)
+images[0].save(gif_folder + gif_name, save_all=True, append_images=images[1:], duration=1000/frames_per_second, loop=0)
