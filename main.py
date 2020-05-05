@@ -9,13 +9,13 @@ from time import localtime
 
 # Planets' masses, positions, velocities
 #planet_initial_conditions = [[.01, 2, 2, .015, 0], [.01, 3, 3, -.02, 0]]
-planet_initial_conditions = [[.1, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .01]]
+planet_initial_conditions = [[.035, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .02]]
 
-max_time = 10
-adaptive_step_size = 0
+max_time = 600
+adaptive_step_size = 1 # 1 to let the scipy solver adapt the time step size
 step_size = 1.e-3
 figure_folder = "plots/"
-figure_name = "three_masses.png"
+figure_name = "three_masses_600.png"
 position_files_folder = "output_files/"
 position_files_prefix = "positions_planet_"
 
@@ -63,8 +63,8 @@ def timestep(t, U):
     
     return return_array
 
-iatol = 1.e-6 # Defaults for tolerance levels
-irtol = 1.e-3
+iatol = 1.e-7 # Defaults for tolerance levels
+irtol = 1.e-4
 
 if adaptive_step_size == 0: # Fix the step size if desired
     iatol = 1.
@@ -86,19 +86,24 @@ print("Integrating took {} minutes and {} seconds.".format(min_passed, sec_passe
 fig = plt.figure(figsize = (12,12))
 ax = fig.add_subplot(2, 1, 1)
 ax2 = fig.add_subplot(2, 1, 2)
+# Plot and subplot titles
 fig.suptitle('Masses moving around one another in Newtonian gravity.')
 ax.set_title('Observer reference frame')
 ax2.set_title('Reference frame of one of the masses.')
+# Plotting trajectories and initial positions
 for planet in planets:
     planet_index = planets.index(planet)
-    ax.scatter(sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :], marker = '.', linewidths = .05, color = 'k')
+    ax.scatter(sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :], marker = '.', s = .5, color = '.3')
+    ax.plot(sol.y[2 * planet_index, 0], sol.y[2 * planet_index + 1, 0], marker = '.', markersize = 10, color = 'k')
     if planet_index == 0:
         continue
     else:
-        ax2.scatter(sol.y[2 * planet_index, :] - sol.y[0, :], sol.y[2 * planet_index + 1, :] - sol.y[1, :], marker = '.', linewidths = .05, color = '.6')
+        ax2.plot(sol.y[2 * planet_index, 0] - sol.y[0, 0], sol.y[2 * planet_index + 1, 0] - sol.y[1, 0], marker = '.', markersize = 10, color = 'k')
+        ax2.scatter(sol.y[2 * planet_index, :] - sol.y[0, :], sol.y[2 * planet_index + 1, :] - sol.y[1, :], marker = '.', s = .5, color = '.6')
 ax2.plot(0, 0, marker = '.', markersize = 20, color = 'k')
-fig.savefig(figure_folder + figure_name)
 
+# Save the file to png, and position and time data to txt
+fig.savefig(figure_folder + figure_name)
 for planet in planets:
     planet_index = planets.index(planet)
     np.savetxt(position_files_folder + position_files_prefix + '{}.txt'.format(planet_index), np.c_[sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :]])
