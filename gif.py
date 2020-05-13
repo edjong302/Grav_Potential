@@ -5,20 +5,20 @@ import os
 
 from PIL import Image
 
-number_of_planets = 2
+number_of_planets = 4
 # This is where and how your PNG's will be saved
 tmp_figure_folder = "gif_figures/"
-tmp_figure_name_prefix = "tmp_two_masses_"
+tmp_figure_name_prefix = "tmp_four_masses_"
 # Where your output files are and what they are called
 position_files_folder = "output_files/"
-position_files_prefix = "positions_planet_"
+position_files_prefix = "positions_four_planets_"
 time_file_name = position_files_prefix + "time.txt"
 # Controls the timestep between two plots, and total time plotted
-plot_interval = 6000
+plot_interval = 4000
 portion_of_data_used = 1
 # What do you call your GIF
 gif_folder = "gifs/"
-gif_name = "two_masses.gif"
+gif_name = "four_masses_long.gif"
 frames_per_second = 20
 
 #######################################################
