@@ -10,7 +10,7 @@ from time import localtime
 # Planets' masses, positions, velocities. The array is [mass, initial x position, initial y position, initial x velocity, initial y velocity].
 # If you want to add a planet, simply add an element to the array below. The script will understand.
 # For two planets you could use these:
-planet_initial_conditions = [[.02, -2, 0, .001, -.005], [.01, 3, 0, 0, 0.01]]
+#planet_initial_conditions = [[.02, -2, 0, .001, -.005], [.01, 3, 0, 0, 0.01]]
 
 # For three planets you could use these:
 #planet_initial_conditions = [[.035, 0, 0, .0025, 0], [.01, -3, 0, 0, -.01], [.01, 3, 0, 0, .02]]
@@ -18,14 +18,13 @@ planet_initial_conditions = [[.02, -2, 0, .001, -.005], [.01, 3, 0, 0, 0.01]]
 # Four planets:
 planet_initial_conditions = [[.035, 0, 0, 0, 0], [.01, -2, 2, 0.005, -.02], [.01, 1, 1, 0, .05], [.015, 1, -3, .01, .015]]
 
-max_time = 1000
+max_time = 100
 adaptive_step_size = 0 # 1 to let the scipy solver adapt the time step size
 step_size = 1.e-3
 figure_folder = "plots/"
 position_files_folder = "output_files/"
-figure_name = "four_masses.png"
-position_files_prefix = "positions_four_planets_"
-
+figure_name = "four_masses_com.png"
+position_files_prefix = "positions_four_planets_com_"
 #######################################################
 
 for dirName in [figure_folder, position_files_folder]:
@@ -119,4 +118,8 @@ for planet in planets:
     planet_index = planets.index(planet)
     np.savetxt(position_files_folder + position_files_prefix + '{}.txt'.format(planet_index), np.c_[sol.y[2 * planet_index, :], sol.y[2 * planet_index + 1, :]])
 np.savetxt(position_files_folder + position_files_prefix + "time.txt", sol.t)
+
+masses = [planet.mass for planet in planets]
+np.savetxt(position_files_folder + position_files_prefix + "masses.txt", masses)
+
 print("Done!")
